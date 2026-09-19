@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { FormEvent, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -106,7 +108,7 @@ export default function EditEmployeePage() {
         setError("");
 
         const response = await fetch(
-          `http://localhost:5000/api/employees/${id}`,
+          `${API_BASE_URL}/api/employees/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -194,7 +196,7 @@ export default function EditEmployeePage() {
         const responses = await Promise.all(
           categories.map((category) =>
             fetch(
-              `http://localhost:5000/api/parameters/${category}?active=true`,
+              `${API_BASE_URL}/api/parameters/${category}?active=true`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -288,7 +290,7 @@ export default function EditEmployeePage() {
       setSaving(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/employees/${id}`,
+        `${API_BASE_URL}/api/employees/${id}`,
         {
           method: "PUT",
           headers: {

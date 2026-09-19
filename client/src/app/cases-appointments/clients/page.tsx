@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -112,7 +114,7 @@ export default function ClientsPage() {
       params.append("limit", limit);
 
       const response = await fetch(
-        `http://localhost:5000/api/clients?${params.toString()}`,
+        `${API_BASE_URL}/api/clients?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -184,7 +186,7 @@ export default function ClientsPage() {
       setDeleting(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/clients/${deleteTarget._id}`,
+        `${API_BASE_URL}/api/clients/${deleteTarget._id}`,
         {
           method: "DELETE",
           headers: {

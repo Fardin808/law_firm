@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 import {
   Save,
@@ -135,22 +137,22 @@ export default function ClientAccountModal({
           accountResponse,
         ] = await Promise.all([
           fetch(
-            "http://localhost:5000/api/parameters/account-head?active=true",
+            "${API_BASE_URL}/api/parameters/account-head?active=true",
             { headers }
           ),
 
           fetch(
-            "http://localhost:5000/api/parameters/account-type?active=true",
+            "${API_BASE_URL}/api/parameters/account-type?active=true",
             { headers }
           ),
 
           fetch(
-            "http://localhost:5000/api/parameters/bank-operator?active=true",
+            "${API_BASE_URL}/api/parameters/bank-operator?active=true",
             { headers }
           ),
 
           fetch(
-            `http://localhost:5000/api/clients/${client._id}/account`,
+            `${API_BASE_URL}/api/clients/${client._id}/account`,
             { headers }
           ),
         ]);
@@ -340,7 +342,7 @@ export default function ClientAccountModal({
       setError("");
 
       const response = await fetch(
-        `http://localhost:5000/api/clients/${client._id}/account`,
+        `${API_BASE_URL}/api/clients/${client._id}/account`,
         {
           method: "PUT",
 

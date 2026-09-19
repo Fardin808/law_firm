@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -159,7 +161,7 @@ export default function EditCasePage() {
         // =================================================
 
         const caseResponse = await fetch(
-          `http://localhost:5000/api/cases/${caseId}`,
+          `${API_BASE_URL}/api/cases/${caseId}`,
           {
             headers,
             cache: "no-store",
@@ -196,7 +198,7 @@ export default function EditCasePage() {
         // =================================================
 
         const availableResponse = await fetch(
-          "http://localhost:5000/api/cases/available-appointments",
+          "${API_BASE_URL}/api/cases/available-appointments",
           {
             headers,
             cache: "no-store",
@@ -333,7 +335,7 @@ export default function EditCasePage() {
       setSaving(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/cases/${caseId}`,
+        `${API_BASE_URL}/api/cases/${caseId}`,
         {
           method: "PUT",
 

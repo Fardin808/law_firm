@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -91,7 +93,7 @@ export default function AttendanceInfoPage() {
       setError("");
 
       const response = await fetch(
-        "http://localhost:5000/api/attendance/generate-date",
+        "${API_BASE_URL}/api/attendance/generate-date",
         {
           method: "POST",
 
@@ -178,7 +180,7 @@ export default function AttendanceInfoPage() {
       setError("");
 
       const response = await fetch(
-        `http://localhost:5000/api/attendance/${record._id}`,
+        `${API_BASE_URL}/api/attendance/${record._id}`,
         {
           method: "PUT",
 

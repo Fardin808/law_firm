@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 
@@ -132,7 +134,7 @@ export default function DashboardPage() {
         setError("");
 
         const response = await fetch(
-          "http://localhost:5000/api/dashboard/overview",
+          "${API_BASE_URL}/api/dashboard/overview",
           {
             headers: {
               Authorization: `Bearer ${token}`,

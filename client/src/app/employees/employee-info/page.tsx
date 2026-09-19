@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -214,7 +216,7 @@ export default function EmployeeInfoPage() {
         const [departmentResponse, designationResponse] =
           await Promise.all([
             fetch(
-              "http://localhost:5000/api/parameters/department?active=true",
+              "${API_BASE_URL}/api/parameters/department?active=true",
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -224,7 +226,7 @@ export default function EmployeeInfoPage() {
             ),
 
             fetch(
-              "http://localhost:5000/api/parameters/designation?active=true",
+              "${API_BASE_URL}/api/parameters/designation?active=true",
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -310,7 +312,7 @@ export default function EmployeeInfoPage() {
       params.append("limit", limit);
 
       const response = await fetch(
-        `http://localhost:5000/api/employees?${params.toString()}`,
+        `${API_BASE_URL}/api/employees?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -373,7 +375,7 @@ export default function EmployeeInfoPage() {
       setDeleting(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/employees/${deleteTarget._id}`,
+        `${API_BASE_URL}/api/employees/${deleteTarget._id}`,
         {
           method: "DELETE",
           headers: {
@@ -432,7 +434,7 @@ export default function EmployeeInfoPage() {
       setSchedulesLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/attendance-schedules",
+        "${API_BASE_URL}/api/attendance-schedules",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -499,7 +501,7 @@ export default function EmployeeInfoPage() {
       setScheduleError("");
 
       const response = await fetch(
-        `http://localhost:5000/api/employees/${selectedEmployee._id}/attendance-schedule`,
+        `${API_BASE_URL}/api/employees/${selectedEmployee._id}/attendance-schedule`,
         {
           method: "PUT",
 
@@ -582,7 +584,7 @@ export default function EmployeeInfoPage() {
       setLeaveSchedulesLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/leave-schedules?active=true",
+        "${API_BASE_URL}/api/leave-schedules?active=true",
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -644,7 +646,7 @@ export default function EmployeeInfoPage() {
       setLeaveScheduleError("");
 
       const response = await fetch(
-        `http://localhost:5000/api/employees/${selectedLeaveEmployee._id}/leave-schedule`,
+        `${API_BASE_URL}/api/employees/${selectedLeaveEmployee._id}/leave-schedule`,
         {
           method: "PUT",
 

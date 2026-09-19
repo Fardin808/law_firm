@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -172,7 +174,7 @@ export default function CasesPage() {
       params.append("limit", limit);
 
       const response = await fetch(
-        `http://localhost:5000/api/cases?${params.toString()}`,
+        `${API_BASE_URL}/api/cases?${params.toString()}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -262,7 +264,7 @@ export default function CasesPage() {
       setDeleting(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/cases/${deleteTarget._id}`,
+        `${API_BASE_URL}/api/cases/${deleteTarget._id}`,
         {
           method: "DELETE",
 

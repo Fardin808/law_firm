@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useEffect, useMemo, useState } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -120,7 +122,7 @@ export default function LeaveBalancePage() {
         setError("");
 
         const response = await fetch(
-          "http://localhost:5000/api/employees?limit=100",
+          "${API_BASE_URL}/api/employees?limit=100",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -187,7 +189,7 @@ export default function LeaveBalancePage() {
         setLeaveBalance(null);
 
         const response = await fetch(
-          `http://localhost:5000/api/leave-balances/employee/${selectedEmployeeId}`,
+          `${API_BASE_URL}/api/leave-balances/employee/${selectedEmployeeId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

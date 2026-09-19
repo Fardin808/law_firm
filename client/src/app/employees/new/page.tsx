@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { FormEvent, useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -104,7 +106,7 @@ export default function NewEmployeePage() {
         setCodeLoading(true);
 
         const response = await fetch(
-          "http://localhost:5000/api/employees/next-code",
+          "${API_BASE_URL}/api/employees/next-code",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -171,7 +173,7 @@ export default function NewEmployeePage() {
         const responses = await Promise.all(
           categories.map((category) =>
             fetch(
-              `http://localhost:5000/api/parameters/${category}?active=true`,
+              `${API_BASE_URL}/api/parameters/${category}?active=true`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -270,7 +272,7 @@ export default function NewEmployeePage() {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/employees",
+        "${API_BASE_URL}/api/employees",
         {
           method: "POST",
           headers: {

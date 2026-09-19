@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { FormEvent, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -80,7 +82,7 @@ export default function NewAttendanceSchedulePage() {
       setLoading(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/attendance-schedules",
+        "${API_BASE_URL}/api/attendance-schedules",
         {
           method: "POST",
 

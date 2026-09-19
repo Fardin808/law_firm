@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -120,7 +122,7 @@ export default function NewCasePage() {
         setError("");
 
         const response = await fetch(
-          "http://localhost:5000/api/cases/available-appointments",
+          "${API_BASE_URL}/api/cases/available-appointments",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -200,7 +202,7 @@ export default function NewCasePage() {
       setSaving(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/cases",
+        "${API_BASE_URL}/api/cases",
         {
           method: "POST",
 

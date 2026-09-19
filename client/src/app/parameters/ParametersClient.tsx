@@ -2,8 +2,8 @@
 
 import { API_BASE_URL } from "@/lib/api";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
 import { toast } from "sonner";
 
 import AdminLayout from "@/components/layout/AdminLayout";
@@ -12,38 +12,138 @@ import {
   Plus,
   Pencil,
   Trash2,
-  CalendarClock,
+  Search,
+  Database,
+  Tag,
+  Landmark,
+  CalendarDays,
+  Users,
+  Award,
+  CalendarCheck,
+  CircleUserRound,
+  VenusAndMars,
+  Heart,
+  Globe2,
+  SlidersHorizontal,
   ChevronRight,
-  Clock3,
-  AlertTriangle,
   X,
+  AlertTriangle,
 } from "lucide-react";
 
-type AttendanceSchedule = {
+// =====================================================
+// Types
+// =====================================================
+
+type ParentParameter = {
   _id: string;
   name: string;
-  startTime: string;
-  endTime: string;
-  intervalStart: string;
-  intervalEnd: string;
+  category: string;
   isActive: boolean;
 };
 
-export default function AttendanceSchedulePage() {
+type Parameter = {
+  _id: string;
+  category: string;
+  name: string;
+  isActive: boolean;
+  parentParameter?: ParentParameter | null;
+};
+
+// =====================================================
+// Parameter Categories
+// =====================================================
+
+const parameterCategories = [
+  {
+    label: "Account Head",
+    value: "account-head",
+    icon: Database,
+  },
+  {
+    label: "Account Type",
+    value: "account-type",
+    icon: Tag,
+  },
+  {
+    label: "Bank Operator",
+    value: "bank-operator",
+    icon: Landmark,
+  },
+  {
+    label: "Leave Type",
+    value: "leave-type",
+    icon: CalendarDays,
+  },
+  {
+    label: "Department",
+    value: "department",
+    icon: Users,
+  },
+  {
+    label: "Designation",
+    value: "designation",
+    icon: Award,
+  },
+  {
+    label: "Appointment Type",
+    value: "appointment-type",
+    icon: CalendarCheck,
+  },
+  {
+    label: "Religion",
+    value: "religion",
+    icon: CircleUserRound,
+  },
+  {
+    label: "Gender",
+    value: "gender",
+    icon: VenusAndMars,
+  },
+  {
+    label: "Marital Status",
+    value: "marital-status",
+    icon: Heart,
+  },
+  {
+    label: "Nationalities",
+    value: "nationality",
+    icon: Globe2,
+  },
+];
+
+// =====================================================
+// Page
+// =====================================================
+
+export default function ParametersPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
 
-  const [schedules, setSchedules] = useState<
-    AttendanceSchedule[]
-  >([]);
+  const categoryFromUrl = searchParams.get("category");
 
+  const selectedCategory = parameterCategories.some(
+    (item) => item.value === categoryFromUrl
+  )
+    ? categoryFromUrl!
+    : "account-head";
+
+  const isBankOperator =
+    selectedCategory === "bank-operator";
+
+  const [parameters, setParameters] = useState<Parameter[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [searchTerm, setSearchTerm] = useState("");
 
-  // Delete modal
+  // Delete modal states
   const [deleteTarget, setDeleteTarget] =
-    useState<AttendanceSchedule | null>(null);
+    useState<Parameter | null>(null);
 
   const [deleting, setDeleting] = useState(false);
+
+  const currentCategory = parameterCategories.find(
+    (item) => item.value === selectedCategory
+  );
 
   // =====================================================
   // Token
@@ -57,28 +157,10 @@ export default function AttendanceSchedulePage() {
   };
 
   // =====================================================
-  // Format Time
+  // Fetch Parameters
   // =====================================================
 
-  const formatTime = (time: string) => {
-    if (!time) return "—";
-
-    const [hourString, minute] = time.split(":");
-
-    let hour = Number(hourString);
-
-    const period = hour >= 12 ? "PM" : "AM";
-
-    hour = hour % 12 || 12;
-
-    return `${hour}:${minute} ${period}`;
-  };
-
-  // =====================================================
-  // Fetch Schedules
-  // =====================================================
-
-  const fetchSchedules = async () => {
+  const fetchParameters = async () => {
     const token = getToken();
 
     if (!token) {
@@ -91,7 +173,7 @@ export default function AttendanceSchedulePage() {
       setError("");
 
       const response = await fetch(
-        "${API_BASE_URL}/api/attendance-schedules",
+        `${API_BASE_URL}/api/parameters/${selectedCategory}`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -112,17 +194,16 @@ export default function AttendanceSchedulePage() {
 
       if (!response.ok) {
         throw new Error(
-          data.message ||
-            "Failed to load attendance schedules."
+          data.message || "Failed to load parameters."
         );
       }
 
-      setSchedules(data.schedules || []);
+      setParameters(data.parameters || []);
     } catch (err) {
       const message =
         err instanceof Error
           ? err.message
-          : "Unable to load attendance schedules.";
+          : "Unable to load parameters.";
 
       setError(message);
       toast.error(message);
@@ -132,21 +213,33 @@ export default function AttendanceSchedulePage() {
   };
 
   useEffect(() => {
-    fetchSchedules();
-  }, []);
+    fetchParameters();
+  }, [selectedCategory]);
 
   // =====================================================
-  // Open Delete Modal
+  // Category Change
   // =====================================================
 
-  const handleDeleteClick = (
-    schedule: AttendanceSchedule
-  ) => {
-    setDeleteTarget(schedule);
+  const handleCategoryChange = (category: string) => {
+    setSearchTerm("");
+
+    router.push(
+      `/parameters?category=${category}`
+    );
   };
 
   // =====================================================
-  // Close Delete Modal
+  // Open Delete Confirmation
+  // =====================================================
+
+  const handleDeleteClick = (
+    parameter: Parameter
+  ) => {
+    setDeleteTarget(parameter);
+  };
+
+  // =====================================================
+  // Close Delete Confirmation
   // =====================================================
 
   const closeDeleteModal = () => {
@@ -173,10 +266,9 @@ export default function AttendanceSchedulePage() {
       setDeleting(true);
 
       const response = await fetch(
-        `${API_BASE_URL}/api/attendance-schedules/${deleteTarget._id}`,
+        `${API_BASE_URL}/api/parameters/${selectedCategory}/${deleteTarget._id}`,
         {
           method: "DELETE",
-
           headers: {
             Authorization: `Bearer ${token}`,
           },
@@ -190,26 +282,28 @@ export default function AttendanceSchedulePage() {
         sessionStorage.removeItem("token");
 
         setDeleteTarget(null);
-
         router.push("/login");
         return;
       }
 
       if (!response.ok) {
-        toast.error(
+        const message =
           data.message ||
-            "Failed to delete attendance schedule."
-        );
+          `Failed to delete ${currentCategory?.label || "parameter"}.`;
 
+        toast.error(message);
         return;
       }
 
       const deletedName = deleteTarget.name;
 
+      // Close modal
       setDeleteTarget(null);
 
-      await fetchSchedules();
+      // Refresh table
+      await fetchParameters();
 
+      // In-app success notification
       toast.success(
         `${deletedName} deleted successfully.`
       );
@@ -223,30 +317,58 @@ export default function AttendanceSchedulePage() {
   };
 
   // =====================================================
+  // Frontend Search
+  // =====================================================
+
+  const filteredParameters = useMemo(() => {
+    const query = searchTerm
+      .trim()
+      .toLowerCase();
+
+    if (!query) {
+      return parameters;
+    }
+
+    return parameters.filter((parameter) => {
+      const name =
+        parameter.name?.toLowerCase() || "";
+
+      const parent =
+        parameter.parentParameter?.name?.toLowerCase() ||
+        "";
+
+      return (
+        name.includes(query) ||
+        parent.includes(query)
+      );
+    });
+  }, [parameters, searchTerm]);
+
+  const tableColumnCount =
+    isBankOperator ? 5 : 4;
+
+  // =====================================================
   // UI
   // =====================================================
 
   return (
     <AdminLayout>
       <div className="text-[#17324d]">
-        {/* =============================================
-            PAGE HEADER
-        ============================================== */}
-
+        {/* PAGE HEADER */}
         <div className="mb-6">
           <div className="flex flex-col justify-between gap-4 lg:flex-row lg:items-start">
             <div>
               <p className="text-[10px] font-semibold uppercase tracking-[0.2em] text-[#b1843d]">
-                Attendance Management
+                System Configuration
               </p>
 
               <h1 className="mt-1 font-serif text-[34px] font-semibold leading-tight text-[#102a43]">
-                Attendance Schedule
+                Parameters
               </h1>
 
               <p className="mt-1 text-sm text-slate-500">
-                Configure office attendance hours,
-                working periods and break intervals.
+                Manage system configuration and
+                reference data for your law firm.
               </p>
             </div>
 
@@ -256,50 +378,120 @@ export default function AttendanceSchedulePage() {
 
               <ChevronRight size={13} />
 
-              <span>Attendance Plan</span>
+              <span>Parameters</span>
 
               <ChevronRight size={13} />
 
               <span className="font-medium text-[#17324d]">
-                Schedule
+                {currentCategory?.label}
               </span>
             </div>
           </div>
         </div>
 
-        {/* =============================================
-            MAIN CARD
-        ============================================== */}
+        {/* CATEGORY NAVIGATION */}
+        <section className="mb-5 rounded-xl border border-slate-200 bg-white p-3 shadow-sm">
+          <div className="flex flex-wrap gap-1">
+            {parameterCategories.map((category) => {
+              const active =
+                selectedCategory === category.value;
 
+              const Icon = category.icon;
+
+              return (
+                <button
+                  key={category.value}
+                  type="button"
+                  onClick={() =>
+                    handleCategoryChange(
+                      category.value
+                    )
+                  }
+                  className={`
+                    group relative flex items-center gap-2
+                    rounded-lg px-3.5 py-3
+                    text-[12px] font-medium
+                    transition-all duration-200
+                    ${
+                      active
+                        ? "bg-[#fbf7ef] text-[#17324d]"
+                        : "text-slate-500 hover:bg-slate-50 hover:text-[#17324d]"
+                    }
+                  `}
+                >
+                  <Icon
+                    size={17}
+                    strokeWidth={1.7}
+                    className={
+                      active
+                        ? "text-[#b1843d]"
+                        : "text-slate-400 transition group-hover:text-[#b1843d]"
+                    }
+                  />
+
+                  <span>{category.label}</span>
+
+                  {active && (
+                    <span className="absolute bottom-0 left-3 right-3 h-[2px] rounded-full bg-[#c79543]" />
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </section>
+
+        {/* MAIN CARD */}
         <section className="overflow-hidden rounded-xl border border-slate-200 bg-white shadow-sm">
-          {/* CARD HEADER */}
-          <div className="flex flex-col gap-4 border-b border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+          {/* Card Heading */}
+          <div className="border-b border-slate-100 px-6 py-5">
             <div className="flex items-center gap-3">
-              <div className="flex h-10 w-10 items-center justify-center rounded-lg bg-[#fbf3e5] text-[#b1843d]">
-                <CalendarClock
-                  size={19}
+              <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#fbf3e5] text-[#b1843d]">
+                <SlidersHorizontal
+                  size={18}
                   strokeWidth={1.8}
                 />
               </div>
 
               <div>
                 <h2 className="font-serif text-[20px] font-semibold text-[#17324d]">
-                  Attendance Schedule List
+                  {currentCategory?.label}
                 </h2>
 
                 <p className="mt-0.5 text-xs text-slate-400">
-                  Manage working hours and attendance
-                  schedules.
+                  Manage{" "}
+                  {currentCategory?.label.toLowerCase()}{" "}
+                  records
                 </p>
               </div>
             </div>
+          </div>
 
-            {/* NEW SCHEDULE */}
+          {/* TOOLBAR */}
+          <div className="flex flex-col gap-4 border-b border-slate-100 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
+            {/* Search */}
+            <div className="relative w-full sm:max-w-[390px]">
+              <Search
+                size={17}
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400"
+              />
+
+              <input
+                type="text"
+                value={searchTerm}
+                onChange={(e) =>
+                  setSearchTerm(e.target.value)
+                }
+                placeholder={`Search ${currentCategory?.label.toLowerCase()}...`}
+                className="h-11 w-full rounded-lg border border-slate-200 bg-[#fafbfc] pl-10 pr-4 text-sm text-[#17324d] outline-none transition-all placeholder:text-slate-400 focus:border-[#c6a364] focus:bg-white focus:ring-2 focus:ring-[#c6a364]/10"
+              />
+            </div>
+
+            {/* Add */}
             <button
               type="button"
               onClick={() =>
                 router.push(
-                  "/attendance-plan/schedule/new"
+                  `/parameters/${selectedCategory}/new`
                 )
               }
               className="flex h-11 shrink-0 items-center justify-center gap-2 rounded-lg bg-[#0b2945] px-5 text-sm font-semibold text-white shadow-sm transition-all duration-200 hover:bg-[#071e34] hover:shadow-md"
@@ -309,189 +501,157 @@ export default function AttendanceSchedulePage() {
                 className="text-[#d6ad66]"
               />
 
-              New Attendance Schedule
+              New {currentCategory?.label}
             </button>
           </div>
 
-          {/* =============================================
-              ERROR
-          ============================================== */}
-
+          {/* ERROR */}
           {error && (
             <div className="mx-6 mt-5 rounded-lg border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
               {error}
             </div>
           )}
 
-          {/* =============================================
-              TABLE
-          ============================================== */}
-
+          {/* TABLE SECTION */}
           <div className="p-6">
             <div className="overflow-hidden rounded-lg border border-slate-200">
-              {/* TABLE TOP BAR */}
+              {/* Table Heading */}
               <div className="flex items-center justify-between border-b border-slate-200 bg-white px-5 py-4">
-                <div className="flex items-center gap-2">
-                  <Clock3
-                    size={16}
-                    className="text-[#b1843d]"
-                  />
-
-                  <h3 className="font-serif text-[16px] font-semibold text-[#17324d]">
-                    Schedule Records
-                  </h3>
-                </div>
+                <h3 className="font-serif text-[16px] font-semibold text-[#17324d]">
+                  {currentCategory?.label} List
+                </h3>
 
                 {!loading && (
                   <span className="rounded-full bg-slate-100 px-3 py-1 text-[11px] font-medium text-slate-500">
-                    {schedules.length}{" "}
-                    {schedules.length === 1
-                      ? "schedule"
-                      : "schedules"}
+                    {filteredParameters.length}{" "}
+                    {filteredParameters.length === 1
+                      ? "record"
+                      : "records"}
                   </span>
                 )}
               </div>
 
               <div className="overflow-x-auto">
-                <table className="w-full min-w-[1050px] border-collapse text-sm">
+                <table className="w-full border-collapse text-sm">
                   <thead>
                     <tr className="border-b border-slate-200 bg-[#f8fafb]">
-                      <th className="w-[75px] px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                      <th className="w-[90px] px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                         SL
                       </th>
+
+                      {isBankOperator && (
+                        <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                          Type
+                        </th>
+                      )}
 
                       <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                         Name
                       </th>
 
-                      <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                        Start Time
-                      </th>
-
-                      <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                        End Time
-                      </th>
-
-                      <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                        Interval Start
-                      </th>
-
-                      <th className="px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
-                        Interval End
-                      </th>
-
-                      <th className="w-[130px] px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                      <th className="w-[170px] px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                         Status
                       </th>
 
-                      <th className="w-[130px] px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
+                      <th className="w-[150px] px-5 py-3.5 text-left text-[11px] font-semibold uppercase tracking-wide text-slate-500">
                         Action
                       </th>
                     </tr>
                   </thead>
 
                   <tbody className="divide-y divide-slate-100">
-                    {/* LOADING */}
                     {loading ? (
                       <tr>
                         <td
-                          colSpan={8}
-                          className="px-5 py-16 text-center"
+                          colSpan={tableColumnCount}
+                          className="px-5 py-14 text-center"
                         >
                           <div className="flex flex-col items-center">
-                            <div className="h-7 w-7 animate-spin rounded-full border-2 border-slate-200 border-t-[#b1843d]" />
+                            <div className="h-6 w-6 animate-spin rounded-full border-2 border-slate-200 border-t-[#b1843d]" />
 
                             <p className="mt-3 text-xs text-slate-400">
-                              Loading attendance
-                              schedules...
+                              Loading records...
                             </p>
                           </div>
                         </td>
                       </tr>
-                    ) : schedules.length === 0 ? (
-                      /* EMPTY STATE */
+                    ) : filteredParameters.length === 0 ? (
                       <tr>
                         <td
-                          colSpan={8}
-                          className="px-5 py-16 text-center"
+                          colSpan={tableColumnCount}
+                          className="px-5 py-14 text-center"
                         >
-                          <CalendarClock
-                            size={34}
-                            strokeWidth={1.3}
+                          <Database
+                            size={30}
+                            strokeWidth={1.4}
                             className="mx-auto text-slate-300"
                           />
 
                           <p className="mt-3 text-sm font-medium text-slate-600">
-                            No attendance schedules found
+                            {searchTerm
+                              ? "No matching records found"
+                              : `No ${currentCategory?.label} found`}
                           </p>
 
                           <p className="mt-1 text-xs text-slate-400">
-                            Create an attendance schedule
-                            to configure working hours.
+                            {searchTerm
+                              ? "Try using a different search term."
+                              : "Create a new record to get started."}
                           </p>
                         </td>
                       </tr>
                     ) : (
-                      schedules.map(
-                        (schedule, index) => (
+                      filteredParameters.map(
+                        (parameter, index) => (
                           <tr
-                            key={schedule._id}
+                            key={parameter._id}
                             className="transition-colors duration-150 hover:bg-[#fdfbf7]"
                           >
                             {/* SL */}
-                            <td className="px-5 py-4 text-slate-500">
+                            <td className="px-5 py-4 text-sm text-slate-500">
                               {String(
                                 index + 1
                               ).padStart(2, "0")}
                             </td>
 
+                            {/* BANK OPERATOR TYPE */}
+                            {isBankOperator && (
+                              <td className="px-5 py-4">
+                                {parameter
+                                  .parentParameter
+                                  ?.name ? (
+                                  <span className="text-sm text-slate-600">
+                                    {
+                                      parameter
+                                        .parentParameter
+                                        .name
+                                    }
+                                  </span>
+                                ) : (
+                                  <span className="text-xs italic text-slate-400">
+                                    Not Assigned
+                                  </span>
+                                )}
+                              </td>
+                            )}
+
                             {/* NAME */}
                             <td className="px-5 py-4">
                               <p className="font-medium text-[#17324d]">
-                                {schedule.name}
+                                {parameter.name}
                               </p>
-                            </td>
-
-                            {/* START TIME */}
-                            <td className="px-5 py-4 text-slate-600">
-                              {formatTime(
-                                schedule.startTime
-                              )}
-                            </td>
-
-                            {/* END TIME */}
-                            <td className="px-5 py-4 text-slate-600">
-                              {formatTime(
-                                schedule.endTime
-                              )}
-                            </td>
-
-                            {/* INTERVAL START */}
-                            <td className="px-5 py-4 text-slate-600">
-                              {formatTime(
-                                schedule.intervalStart
-                              )}
-                            </td>
-
-                            {/* INTERVAL END */}
-                            <td className="px-5 py-4 text-slate-600">
-                              {formatTime(
-                                schedule.intervalEnd
-                              )}
                             </td>
 
                             {/* STATUS */}
                             <td className="px-5 py-4">
-                              {schedule.isActive ? (
+                              {parameter.isActive ? (
                                 <span className="inline-flex items-center gap-1.5 rounded-full bg-emerald-50 px-2.5 py-1 text-[11px] font-medium text-emerald-700">
                                   <span className="h-1.5 w-1.5 rounded-full bg-emerald-500" />
-
                                   Active
                                 </span>
                               ) : (
                                 <span className="inline-flex items-center gap-1.5 rounded-full bg-red-50 px-2.5 py-1 text-[11px] font-medium text-red-600">
                                   <span className="h-1.5 w-1.5 rounded-full bg-red-400" />
-
                                   Inactive
                                 </span>
                               )}
@@ -500,38 +660,34 @@ export default function AttendanceSchedulePage() {
                             {/* ACTION */}
                             <td className="px-5 py-4">
                               <div className="flex items-center gap-2">
-                                {/* EDIT */}
+                                {/* Edit */}
                                 <button
                                   type="button"
                                   title="Edit"
-                                  aria-label={`Edit ${schedule.name}`}
+                                  aria-label={`Edit ${parameter.name}`}
                                   onClick={() =>
                                     router.push(
-                                      `/attendance-plan/schedule/${schedule._id}/edit`
+                                      `/parameters/${selectedCategory}/${parameter._id}/edit`
                                     )
                                   }
                                   className="flex h-8 w-8 items-center justify-center rounded-md bg-blue-50 text-blue-600 transition hover:bg-blue-100 hover:text-blue-700"
                                 >
-                                  <Pencil
-                                    size={15}
-                                  />
+                                  <Pencil size={15} />
                                 </button>
 
-                                {/* DELETE */}
+                                {/* Delete */}
                                 <button
                                   type="button"
                                   title="Delete"
-                                  aria-label={`Delete ${schedule.name}`}
+                                  aria-label={`Delete ${parameter.name}`}
                                   onClick={() =>
                                     handleDeleteClick(
-                                      schedule
+                                      parameter
                                     )
                                   }
                                   className="flex h-8 w-8 items-center justify-center rounded-md bg-red-50 text-red-500 transition hover:bg-red-100 hover:text-red-600"
                                 >
-                                  <Trash2
-                                    size={15}
-                                  />
+                                  <Trash2 size={15} />
                                 </button>
                               </div>
                             </td>
@@ -545,34 +701,35 @@ export default function AttendanceSchedulePage() {
             </div>
 
             {/* TABLE FOOTER */}
-            {!loading && schedules.length > 0 && (
-              <div className="mt-4 flex flex-col gap-2 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
-                <p>
-                  Showing{" "}
-                  <span className="font-medium text-slate-600">
-                    1
-                  </span>{" "}
-                  to{" "}
-                  <span className="font-medium text-slate-600">
-                    {schedules.length}
-                  </span>{" "}
-                  of{" "}
-                  <span className="font-medium text-slate-600">
-                    {schedules.length}
-                  </span>{" "}
-                  results
-                </p>
+            {!loading &&
+              filteredParameters.length > 0 && (
+                <div className="mt-4 flex flex-col gap-2 text-xs text-slate-400 sm:flex-row sm:items-center sm:justify-between">
+                  <p>
+                    Showing{" "}
+                    <span className="font-medium text-slate-600">
+                      1
+                    </span>{" "}
+                    to{" "}
+                    <span className="font-medium text-slate-600">
+                      {filteredParameters.length}
+                    </span>{" "}
+                    of{" "}
+                    <span className="font-medium text-slate-600">
+                      {filteredParameters.length}
+                    </span>{" "}
+                    results
+                  </p>
 
-                <p>Attendance Schedule</p>
-              </div>
-            )}
+                  <p>{currentCategory?.label}</p>
+                </div>
+              )}
           </div>
         </section>
       </div>
 
-      {/* =============================================
+      {/* =====================================================
           DELETE CONFIRMATION MODAL
-      ============================================== */}
+      ===================================================== */}
 
       {deleteTarget && (
         <div
@@ -584,7 +741,7 @@ export default function AttendanceSchedulePage() {
           }}
         >
           <div className="w-full max-w-[440px] overflow-hidden rounded-xl border border-slate-200 bg-white shadow-2xl">
-            {/* MODAL HEADER */}
+            {/* Modal Header */}
             <div className="flex items-start justify-between border-b border-slate-100 px-6 py-5">
               <div className="flex items-center gap-3">
                 <div className="flex h-11 w-11 shrink-0 items-center justify-center rounded-lg bg-red-50 text-red-500">
@@ -593,7 +750,9 @@ export default function AttendanceSchedulePage() {
 
                 <div>
                   <h2 className="font-serif text-[20px] font-semibold text-[#17324d]">
-                    Delete Attendance Schedule
+                    Delete{" "}
+                    {currentCategory?.label ||
+                      "Parameter"}
                   </h2>
 
                   <p className="mt-0.5 text-xs text-slate-400">
@@ -613,7 +772,7 @@ export default function AttendanceSchedulePage() {
               </button>
             </div>
 
-            {/* MODAL BODY */}
+            {/* Modal Body */}
             <div className="px-6 py-6">
               <p className="text-sm leading-6 text-slate-600">
                 Are you sure you want to delete{" "}
@@ -625,14 +784,14 @@ export default function AttendanceSchedulePage() {
 
               <div className="mt-4 rounded-lg border border-red-100 bg-red-50/70 px-4 py-3">
                 <p className="text-xs leading-5 text-red-600">
-                  This attendance schedule will be
-                  permanently removed. This action
-                  cannot be undone.
+                  This record will be permanently
+                  removed. This action cannot be
+                  undone.
                 </p>
               </div>
             </div>
 
-            {/* MODAL ACTIONS */}
+            {/* Modal Actions */}
             <div className="flex items-center justify-end gap-3 border-t border-slate-100 bg-[#fafbfc] px-6 py-4">
               <button
                 type="button"

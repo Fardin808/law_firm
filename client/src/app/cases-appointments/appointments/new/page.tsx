@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -134,7 +136,7 @@ export default function NewAppointmentPage() {
           clientResponse,
         ] = await Promise.all([
           fetch(
-            "http://localhost:5000/api/parameters/appointment-type?active=true",
+            "${API_BASE_URL}/api/parameters/appointment-type?active=true",
             {
               headers,
               cache: "no-store",
@@ -142,7 +144,7 @@ export default function NewAppointmentPage() {
           ),
 
           fetch(
-            "http://localhost:5000/api/employees?limit=100",
+            "${API_BASE_URL}/api/employees?limit=100",
             {
               headers,
               cache: "no-store",
@@ -150,7 +152,7 @@ export default function NewAppointmentPage() {
           ),
 
           fetch(
-            "http://localhost:5000/api/clients?status=active&limit=100",
+            "${API_BASE_URL}/api/clients?status=active&limit=100",
             {
               headers,
               cache: "no-store",
@@ -309,7 +311,7 @@ export default function NewAppointmentPage() {
       setSaving(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/appointments",
+        "${API_BASE_URL}/api/appointments",
         {
           method: "POST",
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import {
   FormEvent,
   useEffect,
@@ -105,7 +107,7 @@ export default function EditLeaveSchedulePage() {
           scheduleResponse,
         ] = await Promise.all([
           fetch(
-            "http://localhost:5000/api/parameters/leave-type?active=true",
+            "${API_BASE_URL}/api/parameters/leave-type?active=true",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -115,7 +117,7 @@ export default function EditLeaveSchedulePage() {
           ),
 
           fetch(
-            `http://localhost:5000/api/leave-schedules/${id}`,
+            `${API_BASE_URL}/api/leave-schedules/${id}`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -277,7 +279,7 @@ export default function EditLeaveSchedulePage() {
       setSaving(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/leave-schedules/${id}`,
+        `${API_BASE_URL}/api/leave-schedules/${id}`,
         {
           method: "PUT",
 

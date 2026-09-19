@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -77,7 +79,7 @@ export default function LeaveSchedulePage() {
       const [leaveTypeResponse, scheduleResponse] =
         await Promise.all([
           fetch(
-            "http://localhost:5000/api/parameters/leave-type?active=true",
+            "${API_BASE_URL}/api/parameters/leave-type?active=true",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -86,7 +88,7 @@ export default function LeaveSchedulePage() {
             }
           ),
           fetch(
-            "http://localhost:5000/api/leave-schedules",
+            "${API_BASE_URL}/api/leave-schedules",
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -208,7 +210,7 @@ export default function LeaveSchedulePage() {
       setDeleting(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/leave-schedules/${deleteTarget._id}`,
+        `${API_BASE_URL}/api/leave-schedules/${deleteTarget._id}`,
         {
           method: "DELETE",
           headers: {

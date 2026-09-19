@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import {
   FormEvent,
   useEffect,
@@ -90,7 +92,7 @@ export default function EditAttendanceSchedulePage() {
         setError("");
 
         const response = await fetch(
-          `http://localhost:5000/api/attendance-schedules/${id}`,
+          `${API_BASE_URL}/api/attendance-schedules/${id}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -185,7 +187,7 @@ export default function EditAttendanceSchedulePage() {
       setSaving(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/attendance-schedules/${id}`,
+        `${API_BASE_URL}/api/attendance-schedules/${id}`,
         {
           method: "PUT",
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { FormEvent, useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { Save, ArrowLeft, PlusSquare } from "lucide-react";
@@ -78,7 +80,7 @@ export default function NewParameterPage() {
         setAccountTypesLoading(true);
 
         const response = await fetch(
-          "http://localhost:5000/api/parameters/account-type?active=true",
+          "${API_BASE_URL}/api/parameters/account-type?active=true",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -168,7 +170,7 @@ export default function NewParameterPage() {
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/parameters/${category}`,
+        `${API_BASE_URL}/api/parameters/${category}`,
         {
           method: "POST",
           headers: {

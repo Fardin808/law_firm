@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import {
   FormEvent,
   useEffect,
@@ -132,7 +134,7 @@ export default function NewLeaveApplicationPage() {
         setError("");
 
         const response = await fetch(
-          "http://localhost:5000/api/employees?limit=100",
+          "${API_BASE_URL}/api/employees?limit=100",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -205,7 +207,7 @@ export default function NewLeaveApplicationPage() {
         setLeaveTypeId("");
 
         const response = await fetch(
-          `http://localhost:5000/api/leave-balances/employee/${employeeId}`,
+          `${API_BASE_URL}/api/leave-balances/employee/${employeeId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -316,7 +318,7 @@ export default function NewLeaveApplicationPage() {
       setSaving(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/leave-applications",
+        "${API_BASE_URL}/api/leave-applications",
         {
           method: "POST",
 

@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import {
   useEffect,
   useMemo,
@@ -144,7 +146,7 @@ export default function LeaveApplicationPage() {
       }
 
       const response = await fetch(
-        `http://localhost:5000/api/leave-applications?${params.toString()}`,
+        `${API_BASE_URL}/api/leave-applications?${params.toString()}`,
         {
           headers: {
             Authorization:
@@ -343,7 +345,7 @@ export default function LeaveApplicationPage() {
       );
 
       const response = await fetch(
-        `http://localhost:5000/api/leave-applications/${application._id}/${action}`,
+        `${API_BASE_URL}/api/leave-applications/${application._id}/${action}`,
         {
           method: "PATCH",
 

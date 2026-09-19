@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -89,7 +91,7 @@ export default function NewClientPage() {
       setSaving(true);
 
       const response = await fetch(
-        "http://localhost:5000/api/clients",
+        "${API_BASE_URL}/api/clients",
         {
           method: "POST",
 

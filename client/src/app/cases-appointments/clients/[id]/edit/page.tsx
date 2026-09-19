@@ -1,5 +1,7 @@
 "use client";
 
+import { API_BASE_URL } from "@/lib/api";
+
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import { toast } from "sonner";
@@ -98,7 +100,7 @@ export default function EditClientPage() {
         setError("");
 
         const response = await fetch(
-          `http://localhost:5000/api/clients/${clientId}`,
+          `${API_BASE_URL}/api/clients/${clientId}`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -173,7 +175,7 @@ export default function EditClientPage() {
       setSaving(true);
 
       const response = await fetch(
-        `http://localhost:5000/api/clients/${clientId}`,
+        `${API_BASE_URL}/api/clients/${clientId}`,
         {
           method: "PUT",
 
