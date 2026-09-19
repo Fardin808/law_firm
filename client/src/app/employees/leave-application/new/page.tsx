@@ -134,7 +134,7 @@ export default function NewLeaveApplicationPage() {
         setError("");
 
         const response = await fetch(
-          "${API_BASE_URL}/api/employees?limit=100",
+          `${API_BASE_URL}/api/employees?limit=100`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -318,7 +318,7 @@ export default function NewLeaveApplicationPage() {
       setSaving(true);
 
       const response = await fetch(
-        "${API_BASE_URL}/api/leave-applications",
+        `${API_BASE_URL}/api/leave-applications`,
         {
           method: "POST",
 

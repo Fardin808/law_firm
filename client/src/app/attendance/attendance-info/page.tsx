@@ -93,7 +93,7 @@ export default function AttendanceInfoPage() {
       setError("");
 
       const response = await fetch(
-        "${API_BASE_URL}/api/attendance/generate-date",
+        `${API_BASE_URL}/api/attendance/generate-date`,
         {
           method: "POST",
 

@@ -79,7 +79,7 @@ export default function LeaveSchedulePage() {
       const [leaveTypeResponse, scheduleResponse] =
         await Promise.all([
           fetch(
-            "${API_BASE_URL}/api/parameters/leave-type?active=true",
+            `${API_BASE_URL}/api/parameters/leave-type?active=true`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,
@@ -88,7 +88,7 @@ export default function LeaveSchedulePage() {
             }
           ),
           fetch(
-            "${API_BASE_URL}/api/leave-schedules",
+            `${API_BASE_URL}/api/leave-schedules`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

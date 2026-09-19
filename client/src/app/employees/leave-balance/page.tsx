@@ -122,7 +122,7 @@ export default function LeaveBalancePage() {
         setError("");
 
         const response = await fetch(
-          "${API_BASE_URL}/api/employees?limit=100",
+          `${API_BASE_URL}/api/employees?limit=100`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

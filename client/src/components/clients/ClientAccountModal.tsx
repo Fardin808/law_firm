@@ -137,17 +137,17 @@ export default function ClientAccountModal({
           accountResponse,
         ] = await Promise.all([
           fetch(
-            "${API_BASE_URL}/api/parameters/account-head?active=true",
+            `${API_BASE_URL}/api/parameters/account-head?active=true`,
             { headers }
           ),
 
           fetch(
-            "${API_BASE_URL}/api/parameters/account-type?active=true",
+            `${API_BASE_URL}/api/parameters/account-type?active=true`,
             { headers }
           ),
 
           fetch(
-            "${API_BASE_URL}/api/parameters/bank-operator?active=true",
+            `${API_BASE_URL}/api/parameters/bank-operator?active=true`,
             { headers }
           ),
 

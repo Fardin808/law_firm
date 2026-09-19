@@ -80,7 +80,7 @@ export default function NewParameterPage() {
         setAccountTypesLoading(true);
 
         const response = await fetch(
-          "${API_BASE_URL}/api/parameters/account-type?active=true",
+          `${API_BASE_URL}/api/parameters/account-type?active=true`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

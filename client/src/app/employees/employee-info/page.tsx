@@ -216,7 +216,7 @@ export default function EmployeeInfoPage() {
         const [departmentResponse, designationResponse] =
           await Promise.all([
             fetch(
-              "${API_BASE_URL}/api/parameters/department?active=true",
+              `${API_BASE_URL}/api/parameters/department?active=true`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -226,7 +226,7 @@ export default function EmployeeInfoPage() {
             ),
 
             fetch(
-              "${API_BASE_URL}/api/parameters/designation?active=true",
+              `${API_BASE_URL}/api/parameters/designation?active=true`,
               {
                 headers: {
                   Authorization: `Bearer ${token}`,
@@ -434,7 +434,7 @@ export default function EmployeeInfoPage() {
       setSchedulesLoading(true);
 
       const response = await fetch(
-        "${API_BASE_URL}/api/attendance-schedules",
+        `${API_BASE_URL}/api/attendance-schedules`,
         {
           headers: {
             Authorization: `Bearer ${token}`,
@@ -584,7 +584,7 @@ export default function EmployeeInfoPage() {
       setLeaveSchedulesLoading(true);
 
       const response = await fetch(
-        "${API_BASE_URL}/api/leave-schedules?active=true",
+        `${API_BASE_URL}/api/leave-schedules?active=true`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

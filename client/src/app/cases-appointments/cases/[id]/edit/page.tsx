@@ -198,7 +198,7 @@ export default function EditCasePage() {
         // =================================================
 
         const availableResponse = await fetch(
-          "${API_BASE_URL}/api/cases/available-appointments",
+          `${API_BASE_URL}/api/cases/available-appointments`,
           {
             headers,
             cache: "no-store",

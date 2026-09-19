@@ -182,7 +182,7 @@ export default function EditAppointmentPage() {
           ),
 
           fetch(
-            "${API_BASE_URL}/api/parameters/appointment-type?active=true",
+            `${API_BASE_URL}/api/parameters/appointment-type?active=true`,
             {
               headers,
               cache: "no-store",
@@ -190,7 +190,7 @@ export default function EditAppointmentPage() {
           ),
 
           fetch(
-            "${API_BASE_URL}/api/employees?limit=100",
+            `${API_BASE_URL}/api/employees?limit=100`,
             {
               headers,
               cache: "no-store",
@@ -198,7 +198,7 @@ export default function EditAppointmentPage() {
           ),
 
           fetch(
-            "${API_BASE_URL}/api/clients?limit=100",
+            `${API_BASE_URL}/api/clients?limit=100`,
             {
               headers,
               cache: "no-store",

@@ -82,7 +82,7 @@ export default function NewAttendanceSchedulePage() {
       setLoading(true);
 
       const response = await fetch(
-        "${API_BASE_URL}/api/attendance-schedules",
+        `${API_BASE_URL}/api/attendance-schedules`,
         {
           method: "POST",
 

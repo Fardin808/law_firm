@@ -106,7 +106,7 @@ export default function NewEmployeePage() {
         setCodeLoading(true);
 
         const response = await fetch(
-          "${API_BASE_URL}/api/employees/next-code",
+          `${API_BASE_URL}/api/employees/next-code`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -272,7 +272,7 @@ export default function NewEmployeePage() {
       setLoading(true);
 
       const response = await fetch(
-        "${API_BASE_URL}/api/employees",
+        `${API_BASE_URL}/api/employees`,
         {
           method: "POST",
           headers: {

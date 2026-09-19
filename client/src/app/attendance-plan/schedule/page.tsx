@@ -91,7 +91,7 @@ export default function AttendanceSchedulePage() {
       setError("");
 
       const response = await fetch(
-        "${API_BASE_URL}/api/attendance-schedules",
+        `${API_BASE_URL}/api/attendance-schedules`,
         {
           headers: {
             Authorization: `Bearer ${token}`,

@@ -66,7 +66,7 @@ export default function NewLeaveSchedulePage() {
         setError("");
 
         const response = await fetch(
-          "${API_BASE_URL}/api/parameters/leave-type?active=true",
+          `${API_BASE_URL}/api/parameters/leave-type?active=true`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -178,7 +178,7 @@ export default function NewLeaveSchedulePage() {
       setSaving(true);
 
       const response = await fetch(
-        "${API_BASE_URL}/api/leave-schedules",
+        `${API_BASE_URL}/api/leave-schedules`,
         {
           method: "POST",
 

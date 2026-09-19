@@ -134,7 +134,7 @@ export default function DashboardPage() {
         setError("");
 
         const response = await fetch(
-          "${API_BASE_URL}/api/dashboard/overview",
+          `${API_BASE_URL}/api/dashboard/overview`,
           {
             headers: {
               Authorization: `Bearer ${token}`,

@@ -107,7 +107,7 @@ export default function EditLeaveSchedulePage() {
           scheduleResponse,
         ] = await Promise.all([
           fetch(
-            "${API_BASE_URL}/api/parameters/leave-type?active=true",
+            `${API_BASE_URL}/api/parameters/leave-type?active=true`,
             {
               headers: {
                 Authorization: `Bearer ${token}`,

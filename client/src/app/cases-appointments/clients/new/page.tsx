@@ -91,7 +91,7 @@ export default function NewClientPage() {
       setSaving(true);
 
       const response = await fetch(
-        "${API_BASE_URL}/api/clients",
+        `${API_BASE_URL}/api/clients`,
         {
           method: "POST",
 

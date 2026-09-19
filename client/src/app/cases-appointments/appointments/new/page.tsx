@@ -136,7 +136,7 @@ export default function NewAppointmentPage() {
           clientResponse,
         ] = await Promise.all([
           fetch(
-            "${API_BASE_URL}/api/parameters/appointment-type?active=true",
+            `${API_BASE_URL}/api/parameters/appointment-type?active=true`,
             {
               headers,
               cache: "no-store",
@@ -144,7 +144,7 @@ export default function NewAppointmentPage() {
           ),
 
           fetch(
-            "${API_BASE_URL}/api/employees?limit=100",
+            `${API_BASE_URL}/api/employees?limit=100`,
             {
               headers,
               cache: "no-store",
@@ -152,7 +152,7 @@ export default function NewAppointmentPage() {
           ),
 
           fetch(
-            "${API_BASE_URL}/api/clients?status=active&limit=100",
+            `${API_BASE_URL}/api/clients?status=active&limit=100`,
             {
               headers,
               cache: "no-store",
@@ -311,7 +311,7 @@ export default function NewAppointmentPage() {
       setSaving(true);
 
       const response = await fetch(
-        "${API_BASE_URL}/api/appointments",
+        `${API_BASE_URL}/api/appointments`,
         {
           method: "POST",
 

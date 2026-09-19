@@ -122,7 +122,7 @@ export default function NewCasePage() {
         setError("");
 
         const response = await fetch(
-          "${API_BASE_URL}/api/cases/available-appointments",
+          `${API_BASE_URL}/api/cases/available-appointments`,
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -202,7 +202,7 @@ export default function NewCasePage() {
       setSaving(true);
 
       const response = await fetch(
-        "${API_BASE_URL}/api/cases",
+        `${API_BASE_URL}/api/cases`,
         {
           method: "POST",
 
