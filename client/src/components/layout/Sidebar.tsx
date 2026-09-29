@@ -18,7 +18,7 @@ import {
   BriefcaseBusiness,
 } from "lucide-react";
 
-export default function Sidebar({collapsed,}: {collapsed: boolean;}) {
+export default function Sidebar() {
   const pathname = usePathname();
 
   const [parametersOpen, setParametersOpen] =
@@ -47,19 +47,18 @@ export default function Sidebar({collapsed,}: {collapsed: boolean;}) {
 
   return (
     <aside
-      className={`
+      className="
         sticky
         top-0
         hidden
         h-screen
+        w-[245px]
         shrink-0
         flex-col
         bg-[#081f34]
         text-slate-300
         lg:flex
-
-        ${collapsed ? "w-[80px]" : "w-[245px]"}
-      `}
+      "
     >
 
       {/* =====================================

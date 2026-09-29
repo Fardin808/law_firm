@@ -10,7 +10,7 @@ import {
 import { useRouter } from "next/navigation";
 
 import {
-  Menu,
+
   Bell,
   Search,
   ChevronDown,
@@ -129,8 +129,7 @@ const searchablePages = [
 // Navbar
 // =====================================================
 
-export default function Navbar({
-  toggleSidebar,}: {toggleSidebar: () => void;}) {
+export default function Navbar() {
   const router = useRouter();
 
   const [search, setSearch] = useState("");
@@ -235,17 +234,6 @@ export default function Navbar({
       ================================================= */}
 
       <div className="flex items-center gap-4">
-
-        {/* Mobile Menu */}
-
-        <button
-          type="button"
-          aria-label="Open menu"
-          onClick={toggleSidebar}
-          className="rounded-lg border border-slate-200 p-2.5 text-[#17324d] transition hover:border-[#d8c29c] hover:bg-[#fbf8f2]"
-        >
-          <Menu size={19} />
-        </button>
 
         {/* =================================================
             SEARCH
