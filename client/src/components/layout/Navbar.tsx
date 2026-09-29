@@ -129,7 +129,8 @@ const searchablePages = [
 // Navbar
 // =====================================================
 
-export default function Navbar() {
+export default function Navbar({
+  toggleSidebar,}: {toggleSidebar: () => void;}) {
   const router = useRouter();
 
   const [search, setSearch] = useState("");
@@ -240,6 +241,7 @@ export default function Navbar() {
         <button
           type="button"
           aria-label="Open menu"
+          onClick={toggleSidebar}
           className="rounded-lg border border-slate-200 p-2.5 text-[#17324d] transition hover:border-[#d8c29c] hover:bg-[#fbf8f2]"
         >
           <Menu size={19} />
