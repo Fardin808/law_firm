@@ -1,7 +1,7 @@
+
 "use client";
 
 import { API_BASE_URL } from "@/lib/api";
-
 import { FormEvent, useState } from "react";
 import {
   Eye,
@@ -9,24 +9,50 @@ import {
   Scale,
   Mail,
   LockKeyhole,
+  User,
 } from "lucide-react";
 import { useRouter } from "next/navigation";
 
 export default function LoginPage() {
   const router = useRouter();
 
+  const [isRegistering, setIsRegistering] = useState(false);
+
+  const [name, setName] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+
   const [showPassword, setShowPassword] = useState(false);
   const [keepSignedIn, setKeepSignedIn] = useState(true);
 
   const [error, setError] = useState("");
+  const [success, setSuccess] = useState("");
   const [loading, setLoading] = useState(false);
 
+  const inputClass = `
+    h-[48px] w-full rounded-md border border-[#d8dde3]
+    bg-white pl-11 pr-4 text-[14px] text-gray-900
+    outline-none transition placeholder:text-gray-400
+    focus:border-[#b58a43] focus:ring-2
+    focus:ring-[#b58a43]/10
+  `;
+
+  const switchMode = () => {
+    setIsRegistering((prev) => !prev);
+    setError("");
+    setSuccess("");
+    setPassword("");
+    setConfirmPassword("");
+    setShowPassword(false);
+  };
+
+  // LOGIN
   const handleLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
     setError("");
+    setSuccess("");
     setLoading(true);
 
     try {
@@ -38,7 +64,7 @@ export default function LoginPage() {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            email,
+            email: email.trim().toLowerCase(),
             password,
           }),
         }
@@ -47,7 +73,7 @@ export default function LoginPage() {
       const data = await response.json();
 
       if (!response.ok) {
-        setError(data.message || "Login failed");
+        setError(data.message || "Login failed.");
         return;
       }
 
@@ -71,17 +97,84 @@ export default function LoginPage() {
     }
   };
 
+  // REGISTER ADMIN ACCOUNT
+  const handleRegister = async (e: FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+
+    setError("");
+    setSuccess("");
+
+    const trimmedName = name.trim();
+    const normalizedEmail = email.trim().toLowerCase();
+
+    if (!trimmedName || !normalizedEmail || !password) {
+      setError("Please fill in all required fields.");
+      return;
+    }
+
+    if (password.length < 6) {
+      setError("Password must be at least 6 characters.");
+      return;
+    }
+
+    if (password !== confirmPassword) {
+      setError("Passwords do not match.");
+      return;
+    }
+
+    setLoading(true);
+
+    try {
+      const response = await fetch(
+        `${API_BASE_URL}/api/auth/register`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            name: trimmedName,
+            email: normalizedEmail,
+            password,
+            // Do not send role.
+            // The backend assigns Admin access.
+          }),
+        }
+      );
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        setError(data.message || "Account creation failed.");
+        return;
+      }
+
+      // Registration succeeded.
+      // Switch to login because the register endpoint
+      // does not return a JWT token.
+      setEmail(normalizedEmail);
+      setName("");
+      setPassword("");
+      setConfirmPassword("");
+      setIsRegistering(false);
+      setSuccess(
+        data.message || "Admin account created successfully. Please sign in."
+      );
+    } catch {
+      setError("Unable to connect to the server.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
-    <main className="h-screen overflow-hidden bg-white">
-      <div className="grid h-full lg:grid-cols-2">
+    <main className="min-h-screen bg-white">
+      <div className="grid min-h-screen lg:grid-cols-2">
 
-        {/* ========================================= */}
         {/* LEFT IMAGE SECTION */}
-        {/* ========================================= */}
 
-        <section className="relative hidden h-full overflow-hidden bg-[#071727] lg:block">
+        <section className="relative hidden min-h-screen overflow-hidden bg-[#071727] lg:block">
 
-          {/* Actual Image */}
           <img
             src="/images/law-login.jpg"
             alt="Law office"
@@ -89,10 +182,8 @@ export default function LoginPage() {
             draggable={false}
           />
 
-          {/* Light dark overlay */}
           <div className="absolute inset-0 bg-[#03101c]/20" />
 
-          {/* Slight bottom gradient for quote readability */}
           <div className="absolute inset-0 bg-gradient-to-t from-[#03101c]/75 via-transparent to-[#03101c]/10" />
 
           {/* Logo */}
@@ -133,17 +224,14 @@ export default function LoginPage() {
 
         </section>
 
-        {/* ========================================= */}
-        {/* RIGHT LOGIN SECTION */}
-        {/* ========================================= */}
+        {/* RIGHT AUTHENTICATION SECTION */}
 
-        <section className="flex h-full items-center justify-center bg-white px-6 py-5 sm:px-10 lg:px-16">
+        <section className="flex min-h-screen items-center justify-center bg-white px-6 py-8 sm:px-10 lg:px-16">
 
           <div className="w-full max-w-[450px]">
 
             {/* Mobile Logo */}
             <div className="mb-6 flex justify-center lg:hidden">
-
               <div className="text-center">
 
                 <Scale
@@ -157,7 +245,6 @@ export default function LoginPage() {
                 </h2>
 
               </div>
-
             </div>
 
             {/* Desktop Logo */}
@@ -180,30 +267,66 @@ export default function LoginPage() {
             </div>
 
             {/* Welcome */}
-
             <div className="mb-5 text-center">
 
               <h2 className="font-serif text-[28px] font-semibold text-[#101820]">
-                Welcome Back
+                {isRegistering ? "Create Admin Account" : "Welcome Back"}
               </h2>
 
               <p className="mt-1 text-[14px] text-gray-500">
-                Sign in to access your account
+                {isRegistering
+                  ? "Register to access the management system"
+                  : "Sign in to access your account"}
               </p>
 
             </div>
 
-            {/* ========================================= */}
-            {/* LOGIN FORM */}
-            {/* ========================================= */}
+            {/* AUTHENTICATION FORM */}
 
-            <form onSubmit={handleLogin}>
+            <form onSubmit={isRegistering ? handleRegister : handleLogin}>
+
+              {/* NAME - REGISTRATION ONLY */}
+
+              {isRegistering && (
+                <div className="mb-4">
+
+                  <label
+                    htmlFor="name"
+                    className="mb-1.5 block text-sm font-medium text-[#263746]"
+                  >
+                    Full Name
+                  </label>
+
+                  <div className="relative">
+
+                    <User
+                      size={17}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
+
+                    <input
+                      id="name"
+                      type="text"
+                      value={name}
+                      onChange={(e) => setName(e.target.value)}
+                      placeholder="Enter your full name"
+                      autoComplete="name"
+                      required
+                      className={inputClass}
+                    />
+
+                  </div>
+                </div>
+              )}
 
               {/* EMAIL */}
 
               <div className="mb-4">
 
-                <label className="mb-1.5 block text-sm font-medium text-[#263746]">
+                <label
+                  htmlFor="email"
+                  className="mb-1.5 block text-sm font-medium text-[#263746]"
+                >
                   Email Address
                 </label>
 
@@ -215,40 +338,27 @@ export default function LoginPage() {
                   />
 
                   <input
+                    id="email"
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter your email"
+                    autoComplete="email"
                     required
-                    className="
-                      h-[48px]
-                      w-full
-                      rounded-md
-                      border
-                      border-[#d8dde3]
-                      bg-white
-                      pl-11
-                      pr-4
-                      text-[14px]
-                      text-gray-900
-                      outline-none
-                      transition
-                      placeholder:text-gray-400
-                      focus:border-[#b58a43]
-                      focus:ring-2
-                      focus:ring-[#b58a43]/10
-                    "
+                    className={inputClass}
                   />
 
                 </div>
-
               </div>
 
               {/* PASSWORD */}
 
               <div className="mb-4">
 
-                <label className="mb-1.5 block text-sm font-medium text-[#263746]">
+                <label
+                  htmlFor="password"
+                  className="mb-1.5 block text-sm font-medium text-[#263746]"
+                >
                   Password
                 </label>
 
@@ -260,115 +370,139 @@ export default function LoginPage() {
                   />
 
                   <input
+                    id="password"
                     type={showPassword ? "text" : "password"}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="Enter your password"
+                    autoComplete={
+                      isRegistering ? "new-password" : "current-password"
+                    }
+                    minLength={isRegistering ? 6 : undefined}
                     required
-                    className="
-                      h-[48px]
-                      w-full
-                      rounded-md
-                      border
-                      border-[#d8dde3]
-                      bg-white
-                      pl-11
-                      pr-12
-                      text-[14px]
-                      text-gray-900
-                      outline-none
-                      transition
-                      placeholder:text-gray-400
-                      focus:border-[#b58a43]
-                      focus:ring-2
-                      focus:ring-[#b58a43]/10
-                    "
+                    className={`${inputClass} pr-12`}
                   />
 
                   <button
                     type="button"
-                    onClick={() =>
-                      setShowPassword((prev) => !prev)
-                    }
-                    aria-label={
-                      showPassword
-                        ? "Hide password"
-                        : "Show password"
-                    }
+                    onClick={() => setShowPassword((prev) => !prev)}
+                    aria-label={showPassword ? "Hide password" : "Show password"}
                     className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 transition hover:text-[#0b2945]"
                   >
-
                     {showPassword ? (
                       <EyeOff size={18} />
                     ) : (
                       <Eye size={18} />
                     )}
-
                   </button>
 
                 </div>
-
               </div>
 
-              {/* ERROR */}
+              {/* CONFIRM PASSWORD - REGISTRATION ONLY */}
+
+              {isRegistering && (
+                <div className="mb-4">
+
+                  <label
+                    htmlFor="confirmPassword"
+                    className="mb-1.5 block text-sm font-medium text-[#263746]"
+                  >
+                    Confirm Password
+                  </label>
+
+                  <div className="relative">
+
+                    <LockKeyhole
+                      size={17}
+                      className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                    />
+
+                    <input
+                      id="confirmPassword"
+                      type={showPassword ? "text" : "password"}
+                      value={confirmPassword}
+                      onChange={(e) => setConfirmPassword(e.target.value)}
+                      placeholder="Confirm your password"
+                      autoComplete="new-password"
+                      minLength={6}
+                      required
+                      className={inputClass}
+                    />
+
+                  </div>
+                </div>
+              )}
+
+              {/* ERROR MESSAGE */}
 
               {error && (
-                <div className="mb-4 rounded-md border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-red-600">
+                <div
+                  role="alert"
+                  className="mb-4 rounded-md border border-red-100 bg-red-50 px-4 py-2.5 text-sm text-red-600"
+                >
                   {error}
                 </div>
               )}
 
-              {/* REMEMBER + FORGOT */}
+              {/* SUCCESS MESSAGE */}
 
-              <div className="mb-5 flex items-center justify-between gap-4">
-
-                <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-600">
-
-                  <input
-                    type="checkbox"
-                    checked={keepSignedIn}
-                    onChange={(e) =>
-                      setKeepSignedIn(e.target.checked)
-                    }
-                    className="h-4 w-4 accent-[#0b2945]"
-                  />
-
-                  Remember me
-
-                </label>
-
-                <button
-                  type="button"
-                  className="text-sm font-medium text-[#a97828] transition hover:text-[#805b1d] hover:underline"
+              {success && (
+                <div
+                  role="status"
+                  className="mb-4 rounded-md border border-green-100 bg-green-50 px-4 py-2.5 text-sm text-green-700"
                 >
-                  Forgot password?
-                </button>
+                  {success}
+                </div>
+              )}
 
-              </div>
+              {/* REMEMBER ME + FORGOT PASSWORD */}
 
-              {/* SIGN IN */}
+              {!isRegistering && (
+                <div className="mb-5 flex items-center justify-between gap-4">
+
+                  <label className="flex cursor-pointer items-center gap-2 text-sm text-gray-600">
+
+                    <input
+                      type="checkbox"
+                      checked={keepSignedIn}
+                      onChange={(e) => setKeepSignedIn(e.target.checked)}
+                      className="h-4 w-4 accent-[#0b2945]"
+                    />
+
+                    Remember me
+
+                  </label>
+
+                  <button
+                    type="button"
+                    className="text-sm font-medium text-[#a97828] transition hover:text-[#805b1d] hover:underline"
+                  >
+                    Forgot password?
+                  </button>
+
+                </div>
+              )}
+
+              {/* SUBMIT BUTTON */}
 
               <button
                 type="submit"
                 disabled={loading}
                 className="
-                  h-[50px]
-                  w-full
-                  rounded-md
-                  bg-[#0b2945]
-                  text-[14px]
-                  font-semibold
-                  tracking-wide
-                  text-white
-                  shadow-sm
-                  transition
-                  duration-200
-                  hover:bg-[#071e34]
-                  disabled:cursor-not-allowed
-                  disabled:opacity-60
+                  h-[50px] w-full rounded-md bg-[#0b2945]
+                  text-[14px] font-semibold tracking-wide text-white
+                  shadow-sm transition duration-200 hover:bg-[#071e34]
+                  disabled:cursor-not-allowed disabled:opacity-60
                 "
               >
-                {loading ? "Signing In..." : "Sign In"}
+                {loading
+                  ? isRegistering
+                    ? "Creating Account..."
+                    : "Signing In..."
+                  : isRegistering
+                    ? "Create Admin Account"
+                    : "Sign In"}
               </button>
 
               {/* DIVIDER */}
@@ -378,16 +512,44 @@ export default function LoginPage() {
                 <div className="h-px flex-1 bg-gray-200" />
 
                 <span className="text-[10px] tracking-wider text-gray-400">
-                  SECURE LOGIN
+                  {isRegistering ? "ADMIN REGISTRATION" : "SECURE LOGIN"}
                 </span>
 
                 <div className="h-px flex-1 bg-gray-200" />
 
               </div>
 
+              {/* SWITCH LOGIN / REGISTER */}
+
+              <p className="text-center text-[13px] text-gray-500">
+
+                {isRegistering
+                  ? "Already have an account?"
+                  : "New to the system?"}
+
+                <button
+                  type="button"
+                  onClick={switchMode}
+                  disabled={loading}
+                  className="ml-1.5 font-semibold text-[#a97828] transition hover:text-[#805b1d] hover:underline disabled:opacity-50"
+                >
+                  {isRegistering ? "Sign In" : "Create Admin Account"}
+                </button>
+
+              </p>
+
+              {/* REGISTRATION NOTICE */}
+
+              {isRegistering && (
+                <p className="mt-4 text-center text-[11px] leading-4 text-amber-700">
+                  Demo access: every newly registered account receives Admin privileges.
+                  Use demo data only.
+                </p>
+              )}
+
               {/* FOOTER */}
 
-              <p className="text-center text-[11px] leading-4 text-gray-400">
+              <p className="mt-5 text-center text-[11px] leading-4 text-gray-400">
                 Protected access to the LAW FIRM management system.
               </p>
 
